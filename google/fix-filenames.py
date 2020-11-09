@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import argparse
 import imghdr
+import hashlib
 import os
 from pathlib import Path
 import shutil
@@ -21,6 +22,7 @@ def parse_args():
     parser.add_argument('--types', nargs='+', choices=ImageTypes, default=['jpeg', 'png'], help='Allowed image types, space-separated')
     parser.add_argument('--force', '-f', action='store_true', help='Force file overwrite')
     parser.add_argument('--verbose', '-v', action='store_true', help='Verbose output')
+    parser.add_argument('--method', '-m', choices=['md5', 'default'], default='default', help='Fixing method')
     return parser.parse_args()
 
 
@@ -55,7 +57,14 @@ def fix(path, output_dir_path, args):
         return
 
     # Make output file path
-    output_path = output_dir_path / (path.stem + '.' + image_type_to_ext(image_type))
+    ext = image_type_to_ext(image_type)
+    if args.method == 'md5':
+        m = hashlib.md5()
+        m.update(path.name.encode('utf-8'))
+        output_name = m.hexdigest() + '.' + ext
+    else:
+        output_name = path.stem + '.' + ext
+    output_path = output_dir_path / output_name
 
     # Check if output path matches input path
     if output_path == path:

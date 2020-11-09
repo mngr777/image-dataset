@@ -10,8 +10,8 @@ ImgSize='xlarge'
 # Search for images, store URLs in temp file
 url_file=`mktemp`
 echo "Temporary image URL list file: " $url_file
-./search.py --apikey $ApiKey --cseid $CseId --imgsize $ImgSize --output $url_file --pagenum 1 -- $query
-if [ $? -neq 0 ]; then exit; fi
+./search.py --apikey $ApiKey --cseid $CseId --imgsize $ImgSize --output $url_file --pagenum 10 -- $query
+if [ $? -ne 0 ]; then exit; fi
 
 # Download images
 mkdir -p $OutputDir
@@ -20,5 +20,4 @@ parallel <$url_file -j 4 wget -nc --timeout=5 --tries=3 --directory-prefix=$Outp
 
 # Fix image file names
 echo "Fixing image file names"
-./fix-filenames.py move --types jpeg png --output $OutputDir -- $OutputDir/*
-
+./fix-filenames.py move --method md5 --types jpeg png --output $OutputDir -- $OutputDir/*
