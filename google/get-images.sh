@@ -22,7 +22,7 @@ grep -Fxv -f $UsedUrlFile $found_url_file > $download_url_file
 # Download images
 mkdir -p $OutputDir
 echo "Downloading images into " $OutputDir
-parallel <$download_url_file -j 4 wget -nc --timeout=5 --tries=3 --directory-prefix=$OutputDir {}
+parallel <$download_url_file -j 4 wget -nv -nc --timeout=5 --tries=3 --directory-prefix=$OutputDir {}
 
 # Update list of used URLs
 cat $download_url_file >> $UsedUrlFile
