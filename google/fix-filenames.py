@@ -22,7 +22,7 @@ def parse_args():
     parser.add_argument('--types', nargs='+', choices=ImageTypes, default=['jpeg', 'png'], help='Allowed image types, space-separated')
     parser.add_argument('--force', '-f', action='store_true', help='Force file overwrite')
     parser.add_argument('--verbose', '-v', action='store_true', help='Verbose output')
-    parser.add_argument('--method', '-m', choices=['md5', 'default'], default='default', help='Fixing method')
+    parser.add_argument('--method', '-m', choices=['default', 'md5-name', 'md5-content'], default='default', help='Fixing method')
     return parser.parse_args()
 
 
@@ -58,9 +58,13 @@ def fix(path, output_dir_path, args):
 
     # Make output file path
     ext = image_type_to_ext(image_type)
-    if args.method == 'md5':
+    if args.method == 'md5-name':
         m = hashlib.md5()
         m.update(path.name.encode('utf-8'))
+        output_name = m.hexdigest() + '.' + ext
+    elif args.method == 'md5-content':
+        m = hashlib.md5();
+        m.update(open(path, 'rb').read())
         output_name = m.hexdigest() + '.' + ext
     else:
         output_name = path.stem + '.' + ext
